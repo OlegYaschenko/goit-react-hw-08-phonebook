@@ -1,61 +1,66 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import propTypes from 'prop-types';
 import { Form, Label, Text, Input, AddContactBtn } from './ContactForm.styled';
 
-class ContactForm extends Component {
-  state = {
-    name: '',
-    number: '',
-  };
+function ContactForm({ onSubmit }) {
+  const [name, setName] = useState('');
+  const [number, setNumber] = useState('');
 
-  hanleNameInput = event => {
+  const hanleNameInput = event => {
     const { name, value } = event.currentTarget;
-    this.setState({ [name]: value });
+    switch (name) {
+      case 'name':
+        setName(value);
+        break;
+
+      case 'number':
+        setNumber(value);
+        break;
+
+      default:
+        break;
+    }
   };
 
-  handleSubmitForm = e => {
+  const handleSubmitForm = e => {
     e.preventDefault();
-    this.props.onSubmit(this.state);
-    this.setState({
-      name: '',
-      number: '',
-    });
+    onSubmit({ name, number });
+    setName('');
+    setNumber('');
   };
 
-  render() {
-    return (
-      <Form onSubmit={this.handleSubmitForm}>
-        <Label>
-          <Text>Name</Text>
+  return (
+    <Form onSubmit={handleSubmitForm}>
+      <Label>
+        <Text>Name</Text>
 
-          <Input
-            type="text"
-            name="name"
-            pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
-            title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
-            required
-            onChange={this.hanleNameInput}
-            value={this.state.name}
-          />
-        </Label>
+        <Input
+          type="text"
+          name="name"
+          pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
+          title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
+          required
+          onChange={hanleNameInput}
+          value={name}
+        />
+      </Label>
 
-        <Label>
-          <Text>Number</Text>
-          <Input
-            placeholder="+XX XXX XXX XX XX"
-            type="tel"
-            name="number"
-            pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
-            title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
-            required
-            onChange={this.hanleNameInput}
-            value={this.state.number}
-          />
-        </Label>
-        <AddContactBtn type="submit">Add contact</AddContactBtn>
-      </Form>
-    );
-  }
+      <Label>
+        <Text>Number</Text>
+        <Input
+          placeholder="+XX XXX XXX XX XX"
+          type="tel"
+          name="number"
+          pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
+          title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
+          required
+          onChange={hanleNameInput}
+          value={number}
+        />
+      </Label>
+      <AddContactBtn type="submit">Add contact</AddContactBtn>
+    </Form>
+  );
 }
 
 ContactForm.propTypes = {
