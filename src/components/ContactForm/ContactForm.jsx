@@ -3,30 +3,18 @@ import propTypes from 'prop-types';
 import { Form, Label, Text, Input, AddContactBtn } from './ContactForm.styled';
 
 function ContactForm({ onSubmit }) {
-  const [name, setName] = useState('');
-  const [number, setNumber] = useState('');
+  const [formInput, setFormInput] = useState({ name: '', number: '' });
+  const { name, number } = formInput;
 
   const hanleNameInput = event => {
     const { name, value } = event.currentTarget;
-    switch (name) {
-      case 'name':
-        setName(value);
-        break;
-
-      case 'number':
-        setNumber(value);
-        break;
-
-      default:
-        break;
-    }
+    setFormInput(state => ({ ...state, [name]: value }));
   };
 
   const handleSubmitForm = e => {
     e.preventDefault();
     onSubmit({ name, number });
-    setName('');
-    setNumber('');
+    setFormInput({ name: '', number: '' });
   };
 
   return (
