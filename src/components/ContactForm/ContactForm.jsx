@@ -1,19 +1,36 @@
 import React, { useState } from 'react';
-import propTypes from 'prop-types';
 import { Form, Label, Text, Input, AddContactBtn } from './ContactForm.styled';
+import { useSelector, useDispatch } from 'react-redux';
+import { pushContact, selectedContacts } from 'redux/contactSlice';
+import { nanoid } from 'nanoid';
 
-function ContactForm({ onSubmit }) {
+function ContactForm() {
+  const dispatch = useDispatch();
+  const contacts = useSelector(selectedContacts);
   const [formInput, setFormInput] = useState({ name: '', number: '' });
   const { name, number } = formInput;
 
-  const hanleNameInput = event => {
+  const addContact = ({ name, number }) => {
+    const id = nanoid();
+    const contactItem = {
+      id,
+      name,
+      number,
+    };
+
+    contacts.some(contact => contact.name.toLowerCase() === name.toLowerCase())
+      ? alert(`${name} is already in contacts`)
+      : dispatch(pushContact(contactItem));
+  };
+
+  const handleNameInput = event => {
     const { name, value } = event.currentTarget;
     setFormInput(state => ({ ...state, [name]: value }));
   };
 
   const handleSubmitForm = e => {
     e.preventDefault();
-    onSubmit({ name, number });
+    addContact({ name, number });
     setFormInput({ name: '', number: '' });
   };
 
@@ -28,7 +45,7 @@ function ContactForm({ onSubmit }) {
           pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
           title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
           required
-          onChange={hanleNameInput}
+          onChange={handleNameInput}
           value={name}
         />
       </Label>
@@ -42,7 +59,7 @@ function ContactForm({ onSubmit }) {
           pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
           title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
           required
-          onChange={hanleNameInput}
+          onChange={handleNameInput}
           value={number}
         />
       </Label>
@@ -50,9 +67,5 @@ function ContactForm({ onSubmit }) {
     </Form>
   );
 }
-
-ContactForm.propTypes = {
-  onSubmit: propTypes.func.isRequired,
-};
 
 export default ContactForm;
