@@ -6,42 +6,39 @@ import {
   Number,
   DeleteBtn,
 } from './ContactList.styled';
-import { useSelector, useDispatch } from 'react-redux';
 import {
-  selectedContacts,
-  removeContact,
-  selectedFilter,
-} from 'redux/contactSlice';
+  useGetContactsQuery,
+  useDeleteContactMutation,
+} from 'redux/contactsApi';
+import { useSelector } from 'react-redux';
 
 const ContactList = () => {
-  const contacts = useSelector(selectedContacts);
-  const filter = useSelector(selectedFilter);
-  const dispatch = useDispatch();
+  const { data: contacts, isLoading } = useGetContactsQuery();
+  const [deleteContact] = useDeleteContactMutation();
+  const filterValue = useSelector(state => state.filter);
 
-  const filteredContactList = () => {
-    const normilizedValue = filter.toLowerCase();
-    return contacts.filter(contact =>
-      contact.name.toLowerCase().includes(normilizedValue)
-    );
-  };
+  const filteredContacts = contacts?.filter(contact =>
+    contact.name.toLowerCase().includes(filterValue)
+  );
 
   return (
     <List>
-      {filteredContactList().map(({ name, id, number }) => {
-        return (
-          <ContactCard key={id}>
-            <Name>{name}</Name>
-            <Number>{number}</Number>
-            <DeleteBtn
-              type="button"
-              id={id}
-              onClick={() => dispatch(removeContact(id))}
-            >
-              Delete
-            </DeleteBtn>
-          </ContactCard>
-        );
-      })}
+      {!isLoading &&
+        filteredContacts.reverse().map(({ name, id, phone }) => {
+          return (
+            <ContactCard key={id}>
+              <Name>{name}</Name>
+              <Number>{phone}</Number>
+              <DeleteBtn
+                type="button"
+                id={id}
+                onClick={() => deleteContact(id)}
+              >
+                Delete
+              </DeleteBtn>
+            </ContactCard>
+          );
+        })}
     </List>
   );
 };
@@ -51,7 +48,7 @@ ContactList.propTypes = {
     propTypes.exact({
       id: propTypes.string.isRequired,
       name: propTypes.string.isRequired,
-      number: propTypes.string.isRequired,
+      phone: propTypes.string.isRequired,
     })
   ),
 };
