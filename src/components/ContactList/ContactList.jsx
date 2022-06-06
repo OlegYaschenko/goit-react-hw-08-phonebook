@@ -1,4 +1,3 @@
-import propTypes from 'prop-types';
 import {
   List,
   ContactCard,
@@ -24,11 +23,11 @@ const ContactList = () => {
   return (
     <List>
       {!isLoading &&
-        filteredContacts.reverse().map(({ name, id, phone }) => {
+        filteredContacts.reverse().map(({ name, id, number }) => {
           return (
             <ContactCard key={id}>
               <Name>{name}</Name>
-              <Number>{phone}</Number>
+              <Number>{number}</Number>
               <DeleteBtn
                 type="button"
                 id={id}
@@ -41,16 +40,6 @@ const ContactList = () => {
         })}
     </List>
   );
-};
-
-ContactList.propTypes = {
-  contacts: propTypes.arrayOf(
-    propTypes.exact({
-      id: propTypes.string.isRequired,
-      name: propTypes.string.isRequired,
-      phone: propTypes.string.isRequired,
-    })
-  ),
 };
 
 export default ContactList;

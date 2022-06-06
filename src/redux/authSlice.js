@@ -16,6 +16,7 @@ export const authSlice = createSlice({
       (state, { payload }) => {
         state.token = payload.token;
         state.user = payload.user;
+        state.isLoggedIn = true;
       }
     );
     builder.addMatcher(
@@ -44,3 +45,7 @@ export const authSlice = createSlice({
     );
   },
 });
+
+export const getIsLoggedIn = state => state.auth.isLoggedIn;
+export const getUserName = state => state.auth.user.name;
+export const getToken = state => state.auth.token;

@@ -1,39 +1,53 @@
-import * as React from 'react';
-import { Link as RouterLink } from 'react-router-dom';
-import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
-import CssBaseline from '@mui/material/CssBaseline';
-import TextField from '@mui/material/TextField';
-import Link from '@mui/material/Link';
-import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
+import { useEffect } from 'react';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import LoadingButton from '@mui/lab/LoadingButton';
+import {
+  Avatar,
+  CssBaseline,
+  TextField,
+  Link,
+  Grid,
+  Box,
+  Typography,
+  Container,
+} from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
+import SendIcon from '@mui/icons-material/Send';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useRegisterUserMutation } from 'redux/authApi';
 
 const theme = createTheme();
 
 export default function RegisterForm() {
-  const [register, { isSuccess, isError }] = useRegisterUserMutation();
+  const navigate = useNavigate();
+  const [register, { isLoading, error, isSuccess }] = useRegisterUserMutation();
+  const propError = error?.data?.errors;
+
   const handleSubmit = async event => {
     event.preventDefault();
-    const formData = new FormData(event.currentTarget);
+    const data = new FormData(event.currentTarget);
     const credential = {
-      name: formData.get('name'),
-      email: formData.get('email'),
-      password: formData.get('password'),
+      name: data.get('name'),
+      email: data.get('email'),
+      password: data.get('password'),
     };
     try {
       await register(credential);
-      console.log(isSuccess);
-      console.log(isError);
-    } catch (error) {
-      console.log(isSuccess);
-      console.log(isError);
+    } catch (err) {
+      alert('Error fetch');
     }
   };
+  useEffect(() => {
+    if (error?.data?.code === 11000) {
+      alert('This email address already exists please choose a unique one.');
+    }
+  }, [error?.data?.code]);
+
+  useEffect(() => {
+    if (isSuccess) {
+      navigate('/contacts', { replace: true });
+    }
+  }, [isSuccess, navigate]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -69,6 +83,8 @@ export default function RegisterForm() {
                   id="name"
                   label="Name"
                   autoFocus
+                  error={propError?.name !== undefined}
+                  helperText={propError?.name?.name || ''}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -80,6 +96,8 @@ export default function RegisterForm() {
                   label="Email Address"
                   name="email"
                   autoComplete="email"
+                  error={propError?.email !== undefined}
+                  helperText={propError?.email?.message || ''}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -91,17 +109,22 @@ export default function RegisterForm() {
                   type="password"
                   id="password"
                   autoComplete="new-password"
+                  error={propError?.password !== undefined}
+                  helperText={propError?.password?.message || ''}
                 />
               </Grid>
             </Grid>
-            <Button
+            <LoadingButton
               type="submit"
               fullWidth
               variant="contained"
+              endIcon={<SendIcon />}
+              loading={isLoading}
+              loadingPosition="end"
               sx={{ mt: 3, mb: 2 }}
             >
               Sign Up
-            </Button>
+            </LoadingButton>
             <Grid container justifyContent="flex-end">
               <Grid item>
                 <Link component={RouterLink} to="/login" variant="body2">
